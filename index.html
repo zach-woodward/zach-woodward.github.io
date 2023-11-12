@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Construction Site App</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: #0056b3;
+            color: #fff;
+            text-align: center;
+            padding: 1rem 0;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        h1, h2, h3 {
+            color: #333;
+        }
+
+        input[type="text"], input[type="number"], button, p {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"], input[type="number"] {
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        button {
+            background-color: #ff8c00;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #e67600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem 0;
+            background-color: #333;
+            color: white;
+        }
+
+        @media screen and (max-width: 600px) {
+            header, footer {
+                padding: 0.5rem 0;
+            }
+
+            main {
+                padding: 10px;
+            }
+
+            h1, h2, h3 {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+
+    <main>
+        <!-- ... other sections ... -->
+
+        <!-- Job Site Calculators Section -->
+        <section id="calculators">
+            <h2>Job Site Calculators</h2>
+
+            <!-- Right Angle Calculator -->
+            <div id="right-angle-calculator">
+                <h3>Right Angle Calculator</h3>
+                <input type="number" id="adjacent" placeholder="Adjacent">
+                <input type="number" id="opposite" placeholder="Opposite">
+                <button type="button" onclick="calculateHypotenuse()">Calculate</button>
+                <p id="hypotenuse-result">Hypotenuse: </p>
+            </div>
+
+            <!-- Decimal to Fraction Calculator -->
+            <div id="decimal-to-fraction">
+                <h3>Decimal to Fraction Calculator</h3>
+                <input type="text" id="decimal" placeholder="Enter Decimal">
+                <button type="button" onclick="convertToFraction()">Convert</button>
+                <p id="fraction-result">Fraction: </p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function calculateHypotenuse() {
+            var adjacent = document.getElementById('adjacent').value;
+            var opposite = document.getElementById('opposite').value;
+            var hypotenuse = Math.sqrt(adjacent * adjacent + opposite * opposite).toFixed(2);
+            document.getElementById('hypotenuse-result').innerText = 'Hypotenuse: ' + hypotenuse;
+        }
+
+        function convertToFraction() {
+            var decimal = parseFloat(document.getElementById('decimal').value);
+            var tolerance = 1.0E-6; // Tolerance level for approximation
+            var h1 = 1; var h2 = 0;
+            var k1 = 0; var k2 = 1;
+            var b = decimal;
+            do {
+                var a = Math.floor(b);
+                var aux = h1; h1 = a * h1 + h2; h2 = aux;
+                aux = k1; k1 = a * k1 + k2; k2 = aux;
+                b = 1 / (b - a);
+            } while (Math.abs(decimal - h1 / k1) > decimal * tolerance);
+
+            document.getElementById('fraction-result').innerText = 'Fraction: ' + h1 + '/' + k1;
+        }
+    </script>
+</body>
+</html>
+
+        <!-- Stopwatch Section -->
+        <section id="stopwatch">
+            <h2>Job Timer</h2>
+            <input type="text" id="timer-title" placeholder="Enter Task Name">
+            <button type="button" onclick="startTimer()">Start Task</button>
+            <button type="button" onclick="stopTimer()">End Task</button>
+            <p id="timer-display">00:00:00</p>
+
+            <table id="time-records">
+                <thead>
+                    <tr>
+                        <th>Task</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Timer records will be added here -->
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <footer>
+        <p>Woodward Technology Systems © 2023</p>
+    </footer>
+
+    <script>
+        var startTime, intervalId, isRunning = false;
+
+        function startTimer() {
+            if (!isRunning) {
+                isRunning = true;
+                startTime = new Date();
+                intervalId = setInterval(updateDisplay, 1000);
+                document.getElementById('timer-display').innerText = "00:00:00";
+            }
+        }
+
+        function stopTimer() {
+            if (isRunning) {
+                clearInterval(intervalId);
+                isRunning = false;
+                var endTime = new Date();
+                var elapsedTime = new Date(endTime - startTime);
+                var title = document.getElementById('timer-title').value || 'Untitled';
+                addRecord(title, formatTime(elapsedTime));
+            }
+        }
+
+        function updateDisplay() {
+            var currentTime = new Date();
+            var elapsedTime = new Date(currentTime - startTime);
+            document.getElementById('timer-display').innerText = formatTime(elapsedTime);
+        }
+
+        function formatTime(time) {
+            var hours = time.getUTCHours().toString().padStart(2, '0');
+            var minutes = time.getUTCMinutes().toString().padStart(2, '0');
+            var seconds = time.getUTCSeconds().toString().padStart(2, '0');
+            return `${hours}:${minutes}:${seconds}`;
+        }
+
+        function addRecord(title, time) {
+            var table = document.getElementById('time-records').getElementsByTagName('tbody')[0];
+            var newRow = table.insertRow();
+            var titleCell = newRow.insertCell(0);
+            var timeCell = newRow.insertCell(1);
+            titleCell.innerText = title;
+            timeCell.innerText = time;
+        }
+    </script>
+</body>
+</html>
