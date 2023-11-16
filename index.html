@@ -7,7 +7,6 @@
 
   gtag('config', 'G-QVPXN2JFJP');
 </script>
-</script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -151,13 +150,14 @@
 
             document.getElementById('fraction-result').innerText = 'Fraction: ' + h1 + '/' + k1;
         }
+
     </script>
 </body>
 </html>
 
         <!-- Stopwatch Section -->
-        <section id="stopwatch">
-            <h2>Job Timer</h2>
+            <section id="stopwatch">
+            <h2>Task Timer</h2>
             <input type="text" id="timer-title" placeholder="Enter Task Name">
             <button type="button" onclick="startTimer()">Start Task</button>
             <button type="button" onclick="stopTimer()">End Task</button>
@@ -174,11 +174,18 @@
                     <!-- Timer records will be added here -->
                 </tbody>
             </table>
+            <!-- The below section is the Email task data -->
+            <section id="email-option">
+                <h2>Email Captured Data</h2>
+                <input type="email" id="recipient-email" placeholder="Recipient's Email">
+                <button type="button" onclick="sendEmail()">Send Email</button>
+            </section>
         </section>
+        
     </main>
 
     <footer>
-        <p>=]</p>
+        <p>Woodward Technology Systems © 2023</p>
         <a href="mailto:zach@woodwardsystems.net?subject=Feedback">Send Feedback to the Developer</a>
     </footer>
 
@@ -202,6 +209,8 @@
                 var elapsedTime = new Date(endTime - startTime);
                 var title = document.getElementById('timer-title').value || 'Untitled';
                 addRecord(title, formatTime(elapsedTime));
+                addRecordToMongoDB();
+                addRecord(title, duration);
             }
         }
 
@@ -226,6 +235,56 @@
             titleCell.innerText = title;
             timeCell.innerText = time;
         }
+        function addRecordToMongoDB() {
+        const taskName = document.getElementById('timer-title').value || 'Untitled';
+        const duration = document.getElementById('timer-display').innerText;
+
+        fetch('/add-task', {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ taskName, duration }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+}
+function sendEmail() {
+  const recipientEmail = document.getElementById('recipient-email').value;
+  const taskData = getTaskDataHTML(); // Use a new function to format the data as HTML
+
+  // Perform validation of recipientEmail and taskData here
+
+  // Send an email with HTML content
+  window.location.href = `mailto:${recipientEmail}?subject=Task Data&body=${encodeURIComponent(taskData)}`;
+}
+
+function getTaskDataHTML() {
+  const table = document.getElementById('time-records');
+  const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+  let taskData = '<html><body>'; // Opening HTML and body tags
+
+  for (let i = 0; i < rows.length; i++) {
+    const cells = rows[i].getElementsByTagName('td');
+    const taskName = cells[0].innerText;
+    const duration = cells[1].innerText;
+
+    // Add task data with line breaks (<br>) between rows
+    taskData += `Task Name: ${taskName}, Duration: ${duration}\n `;
+  }
+
+  taskData += '</br></body></html>'; // Closing body and HTML tags
+
+  return taskData;
+}
+
+
+ 
     </script>
 </body>
 </html>
